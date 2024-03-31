@@ -1,0 +1,111 @@
+・user登録
+１：emailから
+２：Googleから
+
+1
+user->otpをMailableのwithに渡す
+作成エンドポイント
+
+え
+email,pass受け取る→一旦登録（この時認証コードを作成して登録）→メール送信（コードも）→コード検証OK→新規登録
+
+email無しかつstatus0なら完全新規→storeTokenAndEmail()
+emailありかつstatus1ならすでに登録済み->uniqueexception
+emailありかつstatus0なら再登録→storeToken()
+
+post create
+1:user_id,postのtitle,songのtitle, artist, url, platformを受け取り登録
+２：リクエストは以下
+{
+  "post": {
+    "name": "プレイリストのタイトル",
+  },
+  "songs": [
+    0: {
+      "title": "曲のタイトル1",
+      "artist": "アーティスト名1",
+      "url": "曲のURL1",
+      "platform": 1
+    },
+    1: {
+      "title": "曲のタイトル2",
+      "artist": "アーティスト名2",
+      "url": "曲のURL2",
+      "platform": 2
+    }
+    // 必要な数だけSongオブジェクトを追加
+  ]
+}
+3
+
+
+<form method="POST" action="/playlist/create">
+    @csrf
+    <!-- Post情報 -->
+    <div>
+        <label for="post_title">プレイリストタイトル:</label>
+        <input type="text" id="post_title" name="post[title]" required>
+    </div>
+    <div>
+        <label for="post_content">説明:</label>
+        <textarea id="post_content" name="post[content]" required></textarea>
+    </div>
+
+    <!-- Songs情報 -->
+    <div id="songs">
+        <div>
+            <label>曲のタイトル:</label>
+            <input type="text" name="songs[0][title]" required>
+            <label>アーティスト:</label>
+            <input type="text" name="songs[0][artist]" required>
+            <label>URL:</label>
+            <input type="url" name="songs[0][url]" required>
+            <label>プラットフォーム:</label>
+            <select name="songs[0][platform]" required>
+                <option value="1">Spotify</option>
+                <option value="2">Apple Music</option>
+                <option value="3">YouTube</option>
+            </select>
+        </div>
+        <!-- JavaScriptを使用して、必要に応じてフィールドを追加 -->
+    </div>
+    <button type="button" onclick="addSong()">曲を追加</button>
+
+    <button type="submit">送信</button>
+</form>
+
+<script>
+function addSong() {
+    const container = document.getElementById('songs');
+    const index = container.children.length;
+    const html = `
+        <div>
+            <label>曲のタイトル:</label>
+            <input type="text" name="songs[${index}][title]" required>
+            <label>アーティスト:</label>
+            <input type="text" name="songs[${index}][artist]" required>
+            <label>URL:</label>
+            <input type="url" name="songs[${index}][url]" required>
+            <label>プラットフォーム:</label>
+            <select name="songs[${index}][platform]" required>
+                <option value="1">Spotify</option>
+                <option value="2">Apple Music</option>
+                <option value="3">YouTube</option>
+            </select>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+</script>
+
+post read
+1:ユーザーに紐つく全権取得
+２：検索条件による取得→「tag, 曲めい、artist名」
+
+3/31
+・投稿新規作成時にタグ追加処理
+・画像登録
+・いいね押した
+。検索
+・タグ関連
+
