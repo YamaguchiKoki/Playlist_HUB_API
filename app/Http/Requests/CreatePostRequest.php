@@ -30,6 +30,7 @@ class CreatePostRequest extends FormRequest
             'songs.*.artist' => 'required|string|max:255',
             'songs.*.url' => 'required|url',
             'songs.*.platform' => 'required|integer|in:0,1,2,3,4',
+            'tags' => 'nullable'
         ];
     }
 

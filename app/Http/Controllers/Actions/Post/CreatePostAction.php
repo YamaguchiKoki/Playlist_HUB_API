@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Actions\Post;
 
 use App\Domain\Models\Post;
 use App\Domain\Models\Song;
+use App\Domain\Models\Tag;
 use App\Domain\Services\PostService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePostRequest;
@@ -37,18 +38,19 @@ final class CreatePostAction extends Controller
             $post = $this->service->registerPost($user->id, $attributes['post']);
 
             $this->service->registerSongsWithPost($post->id, $attributes['songs']);
-    //         $tags = $request->tags; // タグのIDの配列または新しいタグの名前が想定されます
+            
+            $tags = $request->tags; // タグのIDの配列または新しいタグの名前が想定されます
 
-    //         foreach ($tags as $tag) {
-    //             if (is_numeric($tag)) {
-    //                 // 既存のタグIDが送信された場合
-    //                 $post->tags()->attach($tag);
-    //             } else {
-    //                 // 新しいタグの名前が送信された場合
-    //                 $newTag = Tag::create(['name' => $tag]);
-    //                 $post->tags()->attach($newTag->id);
-    //             }
-    // }
+            foreach ($tags as $tag) {
+                if (is_numeric($tag)) {
+                    // 既存のタグIDが送信された場合
+                    $post->tags()->attach($tag);
+                } else {
+                    // 新しいタグの名前が送信された場合
+                    $newTag = Tag::create(['name' => $tag]); //既存のタグだけでいいかな？
+                    $post->tags()->attach($newTag->id);
+                }
+            }
 
             DB::commit();
 

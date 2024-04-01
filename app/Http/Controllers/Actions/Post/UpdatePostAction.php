@@ -29,7 +29,6 @@ final class UpdatePostAction extends Controller
      */
     public function __invoke(Request $request, Post $post)
     {
-        Log::debug(print_r($request->deletedSongIds, true));
         try {
             DB::beginTransaction();
 
@@ -52,7 +51,7 @@ final class UpdatePostAction extends Controller
                     $post->songs()->create($newSong);
                 }
             }
-            
+
             DB::commit();
         } catch(\Exception $e) {
             DB::rollBack();

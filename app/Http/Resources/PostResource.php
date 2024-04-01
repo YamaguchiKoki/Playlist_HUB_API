@@ -18,6 +18,7 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
+            'likes_count' => $this->likes_count,
             '_links' => [
                 'self' => [
                     'href' => route('user.mypage') //postdetailに変更

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Actions\Post\CreatePostAction;
 use App\Http\Controllers\Actions\Post\RetrieveUserPostsAction;
+use App\Http\Controllers\Actions\Post\ToggleLikeAction;
 use App\Http\Controllers\Actions\Post\UpdatePostAction;
 use App\Http\Controllers\Actions\User\Google\ActivateGoogleUserAction;
 use App\Http\Controllers\Actions\User\Google\RetrieveRedirectUriAction;
@@ -46,6 +47,7 @@ Route::middleware('web')->group(function () {
 
 
 Route::middleware('auth')->group(function() {
-    Route::post('posts/register', CreatePostAction::class)->name('create.post');
+    Route::post('posts/register', CreatePostAction::class)->name('post.create');
     Route::post('posts/update/{post}', UpdatePostAction::class)->name('post.update');
+    Route::post('posts/{post}/toggle-like', ToggleLikeAction::class)->name('post.like');
 });

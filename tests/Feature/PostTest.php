@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Models\Post;
 use App\Domain\Models\Song;
+use App\Domain\Models\Tag;
 use App\Domain\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -26,6 +27,10 @@ class PostTest extends TestCase
         //userの登録
         $user = User::factory()->create();
 
+        //tagの追加
+        $tags = Tag::factory(3)->create();
+
+        $tagsId = $tags->pluck('id')->toArray();
         //requestの作成
         $requestBody = [
             'post' => ['name' => 'name1', 'description' => 'desc'],
@@ -48,7 +53,8 @@ class PostTest extends TestCase
                     'url' => 'https://example.com/song3',
                     'platform' => 2
                 ]
-            ]
+            ],
+            'tags' => $tagsId
         ];
 
         $response = $this->actingAs($user)->postJson('api/posts/register', $requestBody);
@@ -56,6 +62,9 @@ class PostTest extends TestCase
 
         $this->assertDatabaseHas('posts', [
             'name' => 'name1'
+        ]);
+        $this->assertDatabaseHas('post_tags', [
+            'tag_id' => $tagsId[0]
         ]);
         $this->assertCount(3, Song::all());
         $this->assertThat($response->content(), $this->isJson());
@@ -163,7 +172,7 @@ class PostTest extends TestCase
     #[Test]
     public function 新曲追加()
     {
-        //Userそうにゅう
+        //User挿入
         $user = User::factory()->create();
         //Post挿入
         $post = Post::factory()->create(['user_id' => $user->id]);
@@ -186,6 +195,28 @@ class PostTest extends TestCase
         $this->assertDatabaseHas('songs', [
             'title' => 'newTitle'
         ]);
-
     }
+
+    #[Test]
+    public function いいね追加()
+    {
+        //User挿入
+        $user = User::factory()->create();
+        //Post挿入
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        //Song挿入
+        $song = Song::factory(3)->create(['post_id' => $post->id]);
+
+        $response = $this->actingAs($user)->postJson("api/posts/{$post->id}/toggle-like");
+        $this->assertDatabaseHas('user_likes', [
+            'user_id' => $user->id,
+            'post_id' => $post->id
+        ]);
+        $this->assertDatabaseHas('posts', [
+            'likes_count' => 1
+        ]);
+        $response->assertJsonPath('liked', true);
+        $response->assertStatus(200);
+    }
+
 }
